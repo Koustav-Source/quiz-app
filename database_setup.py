@@ -1,9 +1,8 @@
 import sqlite3
 import os
 
-# Delete old database if exists
-if os.path.exists("database.db"):
-    os.remove("database.db")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+db_path = os.path.join(BASE_DIR, "database.db")
 
 conn = sqlite3.connect('database.db')
 cursor = conn.cursor()
