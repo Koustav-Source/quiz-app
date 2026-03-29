@@ -5,21 +5,24 @@ import random
 app = Flask(__name__)
 app.secret_key = "quiz_secret_key"  # required for session
 
+import os
 import sqlite3
+import database_setup
 
-if not os.path.exists("database.db"):
-    import database_setup
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+db_path = os.path.join(BASE_DIR, "database.db")
+
+if not os.path.exists(db_path):
+    database_setup
 else:
-    # check table exists
-    conn = sqlite3.connect("database.db")
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='questions'")
     table = cursor.fetchone()
     conn.close()
 
     if not table:
-        import database_setup
-        
+        database_setup
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -53,4 +56,4 @@ def quiz():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
