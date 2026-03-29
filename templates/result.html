@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Result</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="container result">
+    <h1>Quiz Result</h1>
+
+    <h2>{{ score }} / {{ total }}</h2>
+
+    <p>Percentage: {{ ((score/total)*100)|round(2) }}%</p>
+
+    <!-- Feedback -->
+    <p>
+    {% if score == total %}
+        🔥 Excellent Performance!
+    {% elif score > total/2 %}
+        👍 Good Job!
+    {% else %}
+        💪 Keep Practicing!
+    {% endif %}
+    </p>
+
+    <!-- Buttons -->
+    <a href="/quiz">
+        <button>Try Again</button>
+    </a>
+
+    <a href="/">
+        <button>Go Home</button>
+    </a>
+
+</div>
+
+</body>
+</html>

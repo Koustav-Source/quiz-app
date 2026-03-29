@@ -1,0 +1,120 @@
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Background */
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    padding: 40px 15px;
+}
+
+/* Container */
+.container {
+    background: white;
+    padding: 30px;
+    max-width: 600px;
+    width: 90%;
+    margin: auto;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+/* Headings */
+h1, h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* Question */
+.question {
+    text-align: left;
+    margin: 20px 0 10px;
+    font-weight: 600;
+}
+
+/* Options (Card Style) */
+.option {
+    display: block;
+    background: #f4f6ff;
+    padding: 12px;
+    margin: 8px 0;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: 0.3s;
+}
+
+.option:hover {
+    background: #e0e7ff;
+}
+
+/* Hide radio */
+input[type="radio"] {
+    display: none;
+}
+
+/* Selected option */
+input[type="radio"]:checked + label {
+    background: #667eea;
+    color: white;
+    border-color: #5a67d8;
+}
+
+/* Button */
+button {
+    width: 100%;
+    margin-top: 20px;
+    padding: 12px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: #5a67d8;
+}
+
+/* Link Button Fix */
+a button {
+    width: auto;
+}
+
+/* Result */
+.result {
+    text-align: center;
+}
+
+/* Mobile Responsive */
+@media (max-width: 600px) {
+    .container {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 600px) {
+    body {
+        padding: 20px 10px;
+    }
+
+    .container {
+        padding: 20px;
+    }
+
+    h1, h2 {
+        font-size: 20px;
+    }
+
+    button {
+        font-size: 14px;
+        padding: 10px;
+    }
+}
