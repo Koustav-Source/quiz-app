@@ -1,16 +1,75 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Quiz App</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %}QuizOS — Test Your Knowledge{% endblock %}
 
-<div class="container">
-    <h1>Quiz Application</h1>
-    <p>Test your knowledge with a simple quiz</p>
-    <a href="/quiz">Start Quiz</a>
+{% block content %}
+<div class="hero">
+  <p class="hero-eyebrow">Knowledge, quantified</p>
+  <h1>Train your<br><em>mind daily.</em></h1>
+  <p class="hero-sub">
+    Five questions. A running clock. Pick your category and difficulty,
+    then see where you land on the leaderboard.
+  </p>
+  {% if user %}
+    <div class="hero-actions">
+      <button onclick="document.getElementById('quiz-config').scrollIntoView({behavior:'smooth'})"
+              class="btn btn-primary btn-lg">Start a quiz →</button>
+      <a href="{{ url_for('leaderboard') }}" class="btn btn-ghost btn-lg">Leaderboard</a>
+    </div>
+  {% else %}
+    <div class="hero-actions">
+      <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">Create account</a>
+      <a href="{{ url_for('login') }}" class="btn btn-ghost btn-lg">Sign in</a>
+    </div>
+  {% endif %}
 </div>
 
-</body>
-</html>
+{% if user %}
+<form id="quiz-config" action="{{ url_for('quiz_start') }}" method="GET">
+  <input type="hidden" id="sel-category"   name="category"   value="all">
+  <input type="hidden" id="sel-difficulty" name="difficulty" value="medium">
+  <input type="hidden" name="count" value="5">
+
+  <div class="config-section">
+    <p class="config-title">Choose a category</p>
+    <div class="config-grid">
+      <button type="button" class="cat-btn active" data-value="all">
+        <span class="cat-btn-label">All categories</span>
+        <span class="cat-btn-sub">Mixed bag</span>
+      </button>
+      {% for cat in categories %}
+      <button type="button" class="cat-btn" data-value="{{ cat }}">
+        <span class="cat-btn-label">{{ cat | capitalize }}</span>
+        <span class="cat-btn-sub">{{ cat }}</span>
+      </button>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="config-section">
+    <p class="config-title">Choose difficulty</p>
+    <div class="config-grid">
+      <button type="button" class="diff-btn" data-value="easy">
+        <span class="diff-badge easy">Easy</span>
+        <span class="cat-btn-sub">2-min timer</span>
+      </button>
+      <button type="button" class="diff-btn active" data-value="medium">
+        <span class="diff-badge medium">Medium</span>
+        <span class="cat-btn-sub">2.5-min timer</span>
+      </button>
+      <button type="button" class="diff-btn" data-value="hard">
+        <span class="diff-badge hard">Hard</span>
+        <span class="cat-btn-sub">3.5-min timer</span>
+      </button>
+      <button type="button" class="diff-btn" data-value="all">
+        <span class="diff-badge" style="background:#1a1a1a;color:var(--muted);">All</span>
+        <span class="cat-btn-sub">Mixed difficulty</span>
+      </button>
+    </div>
+  </div>
+
+  <button type="submit" class="btn btn-primary btn-lg">
+    Begin quiz →
+  </button>
+</form>
+{% endif %}
+{% endblock %}

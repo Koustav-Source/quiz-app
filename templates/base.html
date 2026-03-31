@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}QuizOS{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body {% block body_attrs %}{% endblock %}>
+
+<nav>
+  <div class="nav-inner">
+    <a href="{{ url_for('index') }}" class="nav-logo">Quiz<span>OS</span></a>
+    <div class="nav-links">
+      <a href="{{ url_for('leaderboard') }}" class="nav-link">Leaderboard</a>
+      {% if user %}
+        <span class="nav-username">{{ user.un }}</span>
+        <a href="{{ url_for('logout') }}" class="nav-link">Logout</a>
+      {% else %}
+        <a href="{{ url_for('login') }}" class="nav-link">Login</a>
+        <a href="{{ url_for('register') }}" class="nav-link">Register</a>
+      {% endif %}
+    </div>
+  </div>
+</nav>
+
+<div class="page-wrap">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <ul class="flash-list mt-16">
+        {% for cat, msg in messages %}
+          <li class="flash {{ cat }}">{{ msg }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+
+  {% block content %}{% endblock %}
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

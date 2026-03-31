@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Leaderboard — QuizOS{% endblock %}
+
+{% block content %}
+<div class="lb-header">
+  <div>
+    <h1 style="font-size:32px;">Leaderboard</h1>
+    <p class="text-muted mt-8" style="font-size:14px;">Top scores ranked by accuracy, then speed.</p>
+  </div>
+  <div class="lb-filters">
+    <select id="lb-cat" class="filter-select" style="width:auto;">
+      <option value="all" {% if sel_category == 'all' %}selected{% endif %}>All categories</option>
+      {% for cat in categories %}
+        <option value="{{ cat }}" {% if sel_category == cat %}selected{% endif %}>
+          {{ cat | capitalize }}
+        </option>
+      {% endfor %}
+    </select>
+    <select id="lb-diff" class="filter-select" style="width:auto;">
+      <option value="all"    {% if sel_difficulty == 'all'    %}selected{% endif %}>All levels</option>
+      <option value="easy"   {% if sel_difficulty == 'easy'   %}selected{% endif %}>Easy</option>
+      <option value="medium" {% if sel_difficulty == 'medium' %}selected{% endif %}>Medium</option>
+      <option value="hard"   {% if sel_difficulty == 'hard'   %}selected{% endif %}>Hard</option>
+    </select>
+  </div>
+</div>
+
+{% if entries %}
+<table class="lb-table">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Player</th>
+      <th>Score</th>
+      <th>Category</th>
+      <th>Time</th>
+      <th>Date</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for e in entries %}
+    <tr>
+      <td class="lb-rank {% if loop.index <= 3 %}top3{% endif %}">
+        {% if loop.index == 1 %}🥇
+        {% elif loop.index == 2 %}🥈
+        {% elif loop.index == 3 %}🥉
+        {% else %}{{ loop.index }}{% endif %}
+      </td>
+      <td class="lb-user">{{ e.username }}</td>
+      <td class="lb-pct">{{ e.pct }}%
+        <span style="font-size:11px;color:var(--muted);">{{ e.score }}/{{ e.total }}</span>
+      </td>
+      <td class="lb-cat">
+        <span class="diff-badge {{ e.difficulty }}">{{ e.difficulty }}</span>
+        {{ e.category | capitalize }}
+      </td>
+      <td class="lb-time">
+        {% if e.time_taken_secs %}
+          {{ e.time_taken_secs // 60 }}:{{ '%02d' % (e.time_taken_secs % 60) }}
+        {% else %}—{% endif %}
+      </td>
+      <td class="lb-time">{{ e.played_at[:10] if e.played_at else '—' }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<div class="card" style="text-align:center;padding:48px;">
+  <p style="font-size:32px;margin-bottom:12px;">🏆</p>
+  <p class="text-muted">No entries yet for this filter. Be the first!</p>
+  {% if user %}
+    <a href="{{ url_for('index') }}" class="btn btn-primary mt-16">Start a quiz →</a>
+  {% else %}
+    <a href="{{ url_for('register') }}" class="btn btn-primary mt-16">Create account →</a>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}

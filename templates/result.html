@@ -1,39 +1,67 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Result</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %}Result — QuizOS{% endblock %}
 
-<div class="container result">
-    <h1>Quiz Result</h1>
+{% set user = session.get('token') %}
 
-    <h2>{{ score }} / {{ total }}</h2>
+{% block content %}
+<div class="result-hero">
+  {% if pct >= 80 %}
+    <div class="score-display excellent">{{ pct }}%</div>
+    <p class="result-sub">🔥 Excellent — top-tier performance.</p>
+  {% elif pct >= 50 %}
+    <div class="score-display good">{{ pct }}%</div>
+    <p class="result-sub">👍 Good job — keep sharpening.</p>
+  {% else %}
+    <div class="score-display poor">{{ pct }}%</div>
+    <p class="result-sub">💪 Keep practising — you'll get there.</p>
+  {% endif %}
 
-    <p>Percentage: {{ ((score/total)*100)|round(2) }}%</p>
+  <div class="result-stats">
+    <div class="stat">
+      <span class="stat-val">{{ score }}/{{ total }}</span>
+      <span class="stat-label">Score</span>
+    </div>
+    <div class="stat">
+      {% set mins = elapsed // 60 %}
+      {% set secs = elapsed % 60 %}
+      <span class="stat-val text-mono">{{ mins }}:{{ '%02d' % secs }}</span>
+      <span class="stat-label">Time taken</span>
+    </div>
+    <div class="stat">
+      <span class="stat-val">{{ category | capitalize }}</span>
+      <span class="stat-label">Category</span>
+    </div>
+    <div class="stat">
+      <span class="stat-val diff-badge {{ difficulty }}" style="font-size:14px;">
+        {{ difficulty | capitalize }}
+      </span>
+      <span class="stat-label">Difficulty</span>
+    </div>
+  </div>
 
-    <!-- Feedback -->
-    <p>
-    {% if score == total %}
-        🔥 Excellent Performance!
-    {% elif score > total/2 %}
-        👍 Good Job!
-    {% else %}
-        💪 Keep Practicing!
-    {% endif %}
-    </p>
-
-    <!-- Buttons -->
-    <a href="/quiz">
-        <button>Try Again</button>
-    </a>
-
-    <a href="/">
-        <button>Go Home</button>
-    </a>
-
+  <div class="result-actions">
+    <a href="{{ url_for('quiz_start') }}?category={{ category }}&difficulty={{ difficulty }}"
+       class="btn btn-primary">Try again →</a>
+    <a href="{{ url_for('leaderboard') }}" class="btn btn-ghost">Leaderboard</a>
+    <a href="{{ url_for('index') }}" class="btn btn-ghost">Home</a>
+  </div>
 </div>
 
-</body>
-</html>
+<div>
+  <p class="breakdown-title">Answer breakdown</p>
+  {% for item in breakdown %}
+  <div class="breakdown-item">
+    <p class="bi-q">{{ loop.index }}. {{ item.question }}</p>
+    <div class="bi-meta">
+      {% if item.is_right %}
+        <span class="bi-correct">✓ Correct</span>
+        <span class="bi-ans">Your answer: {{ item.user_answer }}</span>
+      {% else %}
+        <span class="bi-wrong">✗ Wrong — you said: {{ item.user_answer if item.user_answer else '(skipped)' }}</span>
+        <span class="bi-correct">Correct: {{ item.correct }}</span>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
