@@ -20,7 +20,10 @@
 </div>
 
 <div class="progress-wrap">
-  <div class="progress-label" id="progress-label">0 / {{ questions | length }} answered</div>
+  <div class="progress-label" id="progress-label">
+    <span><span class="progress-answered">0</span> / {{ questions | length }} answered</span>
+    <span style="font-size:11px;opacity:0.6;">Press A/B/C/D to answer fast</span>
+  </div>
   <div class="progress-bar">
     <div class="progress-fill" id="progress-fill" style="width:0%"></div>
   </div>
@@ -29,7 +32,7 @@
 <form id="quiz-form" method="POST" action="{{ url_for('quiz_submit') }}">
   {% for q in questions %}
   <div class="question-block">
-    <p class="q-number">Q{{ loop.index }}</p>
+    <p class="q-number">Question {{ loop.index }} of {{ questions | length }}</p>
     <p class="q-text">{{ q.question }}</p>
 
     <div class="options">
@@ -50,7 +53,7 @@
   {% endfor %}
 
   <div class="submit-bar">
-    <span class="submit-note">Tip: press A/B/C/D to pick answers fast</span>
+    <span class="submit-note">Keyboard shortcut: A / B / C / D</span>
     <button type="submit" class="btn btn-primary">Submit quiz →</button>
   </div>
 </form>

@@ -1,10 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}QuizOS{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <!-- Prevent flash of wrong theme: apply saved/OS preference before paint -->
+  <script>
+    (function(){
+      var t = localStorage.getItem('quizos-theme');
+      if (!t) t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
 </head>
 <body {% block body_attrs %}{% endblock %}>
 
@@ -20,6 +28,15 @@
         <a href="{{ url_for('login') }}" class="nav-link">Login</a>
         <a href="{{ url_for('register') }}" class="nav-link">Register</a>
       {% endif %}
+      <!-- Theme toggle -->
+      <button
+        id="theme-toggle"
+        class="theme-toggle"
+        aria-label="Toggle theme"
+        title="Toggle light / dark mode"
+      >
+        <span class="theme-toggle-thumb">🌙</span>
+      </button>
     </div>
   </div>
 </nav>

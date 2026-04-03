@@ -1,15 +1,27 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sign in — QuizOS</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script>
+    (function(){
+      var t = localStorage.getItem('quizos-theme');
+      if (!t) t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
 </head>
 <body>
 <div class="auth-wrap">
   <div class="auth-card">
-    <a href="{{ url_for('index') }}" class="auth-logo">Quiz<span>OS</span></a>
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:32px;">
+      <a href="{{ url_for('index') }}" class="auth-logo" style="margin-bottom:0;">Quiz<span>OS</span></a>
+      <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme" title="Toggle light / dark mode">
+        <span class="theme-toggle-thumb">🌙</span>
+      </button>
+    </div>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
@@ -22,15 +34,15 @@
     {% endwith %}
 
     <div class="card">
-      <h2 style="margin-bottom:24px;">Sign in</h2>
+      <h2 style="margin-bottom:28px;">Sign in</h2>
       <form method="POST">
         <div class="form-group">
           <label for="username">Username</label>
-          <input type="text" id="username" name="username" required autocomplete="username">
+          <input type="text" id="username" name="username" required autocomplete="username" placeholder="Your username">
         </div>
         <div class="form-group">
           <label for="password">Password</label>
-          <input type="password" id="password" name="password" required autocomplete="current-password">
+          <input type="password" id="password" name="password" required autocomplete="current-password" placeholder="••••••••">
         </div>
         <button type="submit" class="btn btn-primary btn-block" style="margin-top:8px;">
           Sign in →

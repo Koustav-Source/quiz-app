@@ -1,21 +1,71 @@
-/* ── Timer ─────────────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════
+   THEME TOGGLE
+═══════════════════════════════════════════════════════════ */
+
+function initTheme() {
+  const STORAGE_KEY = 'quizos-theme';
+  const root        = document.documentElement;
+  const toggleBtn   = document.getElementById('theme-toggle');
+
+  // Icons for the thumb
+  const ICON_DARK  = '🌙';
+  const ICON_LIGHT = '☀';
+
+  function getThumb() {
+    return toggleBtn ? toggleBtn.querySelector('.theme-toggle-thumb') : null;
+  }
+
+  function applyTheme(theme) {
+    root.setAttribute('data-theme', theme);
+    localStorage.setItem(STORAGE_KEY, theme);
+    const thumb = getThumb();
+    if (thumb) {
+      thumb.textContent = theme === 'light' ? ICON_LIGHT : ICON_DARK;
+    }
+    if (toggleBtn) {
+      toggleBtn.setAttribute('aria-label',
+        theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'
+      );
+    }
+  }
+
+  // Restore saved preference, or honour OS preference
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) {
+    applyTheme(saved);
+  } else {
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    applyTheme(prefersDark ? 'dark' : 'light');
+  }
+
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', () => {
+      const current = root.getAttribute('data-theme') || 'dark';
+      applyTheme(current === 'dark' ? 'light' : 'dark');
+    });
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TIMER
+═══════════════════════════════════════════════════════════ */
 
 function initTimer(totalSecs) {
-  const el    = document.getElementById('timer-display');
-  const form  = document.getElementById('quiz-form');
+  const el   = document.getElementById('timer-display');
+  const form = document.getElementById('quiz-form');
   if (!el) return;
 
   let remaining = totalSecs;
 
   function fmt(s) {
-    const m = Math.floor(s / 60);
+    const m   = Math.floor(s / 60);
     const sec = s % 60;
     return `${m}:${sec.toString().padStart(2, '0')}`;
   }
 
   function tick() {
     el.textContent = fmt(remaining);
-    const timerEl = el.closest('.timer');
+    const timerEl  = el.closest('.timer');
 
     if (remaining <= 0) {
       timerEl.classList.add('urgent');
@@ -38,7 +88,9 @@ function initTimer(totalSecs) {
   tick();
 }
 
-/* ── Progress bar ──────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════
+   PROGRESS BAR
+═══════════════════════════════════════════════════════════ */
 
 function initProgress(total) {
   const answered = {};
@@ -51,7 +103,10 @@ function initProgress(total) {
     const count = Object.keys(answered).length;
     const pct   = total > 0 ? Math.round(count / total * 100) : 0;
     fill.style.width = pct + '%';
-    if (label) label.textContent = `${count} / ${total} answered`;
+    if (label) {
+      const span = label.querySelector('.progress-answered');
+      if (span) span.textContent = count;
+    }
   }
 
   radios.forEach(r => {
@@ -64,27 +119,30 @@ function initProgress(total) {
   update();
 }
 
-/* ── Keyboard shortcuts (A/B/C/D to pick option for current visible Q) ─── */
+/* ═══════════════════════════════════════════════════════════
+   KEYBOARD SHORTCUTS — A/B/C/D
+═══════════════════════════════════════════════════════════ */
 
 function initKeyNav() {
   const keys = { a: 0, b: 1, c: 2, d: 3 };
+
   document.addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
     const idx = keys[e.key.toLowerCase()];
     if (idx === undefined) return;
 
-    // Find visible / first unanswered question block
     const blocks = document.querySelectorAll('.question-block');
     for (const block of blocks) {
-      const radios = block.querySelectorAll('input[type="radio"]');
-      const answered = Array.from(radios).some(r => r.checked);
-      if (!answered) {
+      const radios   = block.querySelectorAll('input[type="radio"]');
+      const isAnswered = Array.from(radios).some(r => r.checked);
+      if (!isAnswered) {
         if (radios[idx]) {
           radios[idx].checked = true;
           radios[idx].dispatchEvent(new Event('change', { bubbles: true }));
-          // Scroll the next block into view
           const next = block.nextElementSibling;
-          if (next) next.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          if (next && next.classList.contains('question-block')) {
+            next.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
         }
         break;
       }
@@ -92,7 +150,9 @@ function initKeyNav() {
   });
 }
 
-/* ── Submit guard ──────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════
+   SUBMIT GUARD
+═══════════════════════════════════════════════════════════ */
 
 function initSubmitGuard(total) {
   const form = document.getElementById('quiz-form');
@@ -105,13 +165,17 @@ function initSubmitGuard(total) {
     ).size;
 
     if (answered < total) {
-      const ok = confirm(`You've answered ${answered} of ${total} questions. Submit anyway?`);
+      const ok = confirm(
+        `You've answered ${answered} of ${total} questions.\nSubmit anyway?`
+      );
       if (!ok) e.preventDefault();
     }
   });
 }
 
-/* ── Category / difficulty picker (index page) ─────────────────────────── */
+/* ═══════════════════════════════════════════════════════════
+   CATEGORY / DIFFICULTY PICKER
+═══════════════════════════════════════════════════════════ */
 
 function initPicker(groupClass, inputId) {
   const btns  = document.querySelectorAll('.' + groupClass);
@@ -127,7 +191,9 @@ function initPicker(groupClass, inputId) {
   });
 }
 
-/* ── Leaderboard live filter ───────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════
+   LEADERBOARD LIVE FILTER
+═══════════════════════════════════════════════════════════ */
 
 function initLeaderboardFilter() {
   const catSel  = document.getElementById('lb-cat');
@@ -146,15 +212,22 @@ function initLeaderboardFilter() {
   diffSel.addEventListener('change', reload);
 }
 
-/* ── Init ──────────────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════════════ */
+
+// Theme runs ASAP (not DOMContentLoaded) to avoid flash of wrong theme
+initTheme();
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Timer
   const timerEl = document.getElementById('timer-display');
   if (timerEl) {
     const secs = parseInt(timerEl.dataset.total, 10);
     if (!isNaN(secs)) initTimer(secs);
   }
 
+  // Quiz-page features
   const totalQ = parseInt(document.body.dataset.totalQuestions, 10);
   if (!isNaN(totalQ)) {
     initProgress(totalQ);
@@ -162,7 +235,10 @@ document.addEventListener('DOMContentLoaded', () => {
     initKeyNav();
   }
 
-  initPicker('cat-btn', 'sel-category');
+  // Config pickers
+  initPicker('cat-btn',  'sel-category');
   initPicker('diff-btn', 'sel-difficulty');
+
+  // Leaderboard
   initLeaderboardFilter();
 });
